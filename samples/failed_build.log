@@ -1,0 +1,37 @@
+##[group]Run pytest tests/
+  pytest tests/
+  shell: /usr/bin/bash -e {0}
+##[endgroup]
+
+============================= test session starts ==============================
+platform linux -- Python 3.11.4, pytest-7.4.0, pluggy-1.2.0
+rootdir: /home/runner/work/myapp/myapp
+collected 12 items
+
+tests/test_api.py ..                                                     [ 16%]
+tests/test_auth.py ...                                                   [ 41%]
+tests/test_payments.py FAILED                                            [ 50%]
+tests/test_utils.py ....                                                 [ 83%]
+tests/test_health.py ..                                                  [ 100%]
+
+=================================== FAILURES ===================================
+_________________________ test_payment_retry_logic _____________________________
+
+    def test_payment_retry_logic():
+        gateway = PaymentGateway(api_key="test_key")
+        result = gateway.charge(amount=100, currency="USD", retries=3)
+>       assert result.status == "success"
+E       AssertionError: assert 'timeout' == 'success'
+E        +  where 'timeout' = PaymentResult(status='timeout', code=408, message='Gateway did not respond within 5s').status
+
+tests/test_payments.py:47: AssertionError
+
+------------------------------- Captured log call ------------------------------
+ERROR    payments:gateway.py:83 Request to https://api.stripe.com/v1/charges timed out after 5s (attempt 3/3)
+ERROR    payments:gateway.py:91 All retry attempts exhausted. Raising PaymentGatewayTimeout.
+
+=================================== short test summary info ====================
+FAILED tests/test_payments.py::test_payment_retry_logic - AssertionError: assert 'timeout' == 'success'
+============================== 1 failed, 11 passed in 4.32s ==============================
+
+##[error]Process completed with exit code 1.
